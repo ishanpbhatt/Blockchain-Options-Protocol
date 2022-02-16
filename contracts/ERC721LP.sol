@@ -15,9 +15,9 @@ contract ERC721LP {
     mapping(address => uint256) poolShareMap;
     uint256 poolShares;
 
-    uint256 erc721Balance = 0;
+    uint256 public erc721Balance = 0;
     uint256[] erc721Array;
-    uint256 erc20Balance = 0;
+    uint256 public erc20Balance = 0;
 
     bool isStarted = false;
 
@@ -144,10 +144,12 @@ contract ERC721LP {
                 "Not approved"
             );
         }
-        require(isStarted == true, "Pool not started yet");
+        uint256 post20Bal = poolShares / (erc721Ids.length + erc721Balance);
+        uint256 erc20Out = erc20Balance - post20Bal;
+        erc20Balance -= erc20Out;
+        erc20Token.transfer(msg.sender, erc20Out);
+
         erc721Balance += erc721Ids.length;
-        erc20Token.transfer(msg.sender, erc20Balance);
-        erc20Balance = poolShares / (erc721Balance);
 
         for (uint256 i = 0; i < erc721Ids.length; i++) {
             erc721Array.push(erc721Ids[i]);

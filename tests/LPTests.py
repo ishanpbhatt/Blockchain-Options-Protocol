@@ -49,15 +49,14 @@ erc20_bal, erc721_bal = liq_pool.getTotalBalances.call({"from": accounts[0]})
 print("Balances: " + str([erc20_bal, erc721_bal]))
 
 var_asset.approve(liq_pool.address, 10**10, {"from": accounts[1]})
-liq_pool.swapIn20.transact(20, {"from": accounts[1]})
+liq_pool.swapIn20.transact(10, {"from": accounts[1]})
 
 # Ensure that two RTEs are swapped out to the right address
 assert rte_contract.ownerOf.call(
-    9, {"from": accounts[1]}) == rte_contract.ownerOf.call(8, {"from": accounts[1]}) == accounts[1].address, "erc721 improperly transferd"
+    9, {"from": accounts[1]}) == accounts[1].address, "erc721 improperly transferd"
 
 erc20_bal, erc721_bal = liq_pool.getTotalBalances.call({"from": accounts[0]})
-assert [erc20_bal, erc721_bal] == [
-    120, 8], "Pool balances post swap are unexpected"
+assert [110, 9] == [erc20_bal, erc721_bal], "Unexpected balances"
 
 
 # Swap in erc721 for erc20 token
@@ -68,15 +67,20 @@ var_asset.approve.transact(calls_center.address, 10**10, {"from": accounts[2]})
 calls_center.mintContract.transact({'from': accounts[2]})
 rte_contract.approve.transact(
     liq_pool.address, 10, {"from": accounts[2]})
+
+erc20_bal, erc721_bal = liq_pool.getTotalBalances.call({"from": accounts[0]})
+print([erc20_bal, erc721_bal])
+
 liq_pool.swapIn721.transact([10], {"from": accounts[2]})
 
 # Ensure balance updates for the pool
 erc20_bal, erc721_bal = liq_pool.getTotalBalances.call({"from": accounts[0]})
 print([erc20_bal, erc721_bal])
 # Ensure balance updates for the user
-time.sleep(1)
-print(var_asset.balanceOf.call(accounts[2].address))
+assert 10000 == var_asset.balanceOf.call(
+    accounts[2].address), 'incorrect balance'
 # Ensure token ownership updates for the user
+
 assert rte_contract.ownerOf(
     10) == liq_pool.address, "unexpected token ownership"
 
