@@ -5,6 +5,9 @@ pragma solidity ^0.8.10;
 import "/Users/ishan/.brownie/packages/OpenZeppelin/openzeppelin-contracts@4.4.1/contracts/token/ERC721/ERC721.sol";
 import "/Users/ishan/.brownie/packages/OpenZeppelin/openzeppelin-contracts@4.4.1/contracts/token/ERC20/ERC20.sol";
 
+// TODO: Add fees to swaps
+// This should be easy, just add param to constructor and take that amount off of
+// the erc20 asset for each transaction
 contract ERC721LP {
     ERC721 erc721Token;
     ERC20 erc20Token;
@@ -12,9 +15,9 @@ contract ERC721LP {
     mapping(address => uint256) poolShareMap;
     uint256 poolShares;
 
-    uint256 erc721Balance;
+    uint256 erc721Balance = 0;
     uint256[] erc721Array;
-    uint256 erc20Balance;
+    uint256 erc20Balance = 0;
 
     bool isStarted = false;
 
@@ -56,6 +59,7 @@ contract ERC721LP {
 
         poolShares = erc721Balance * erc20Balance;
         poolShareMap[msg.sender] = poolShares;
+        isStarted = true;
     }
 
     function getShares(address shareHolder) public view returns (uint256) {
@@ -66,6 +70,10 @@ contract ERC721LP {
         return poolShares;
     }
 
+    function getTotalBalances() public view returns (uint256, uint256) {
+        return (erc20Balance, erc721Balance);
+    }
+
     function addLiquidity(uint256[] memory erc721Ids, uint256 _erc20Balance)
         public
     {
@@ -74,7 +82,6 @@ contract ERC721LP {
             erc20Balance / erc721Balance == _erc20Balance / erc721Ids.length,
             "Need to satisfy the ratio of balance"
         );
-        require(isStarted == false, "LP already started");
         require(
             erc20Token.balanceOf(msg.sender) >= _erc20Balance,
             "Not enough ERC20 Balance"
@@ -125,7 +132,7 @@ contract ERC721LP {
         erc20Token.transfer(msg.sender, erc20Out);
     }
 
-    function swapin721(uint256[] memory erc721Ids) public {
+    function swapIn721(uint256[] memory erc721Ids) public {
         require(isStarted == true, "Pool not started yet");
         for (uint256 i = 0; i < erc721Ids.length; i++) {
             require(
@@ -138,11 +145,9 @@ contract ERC721LP {
             );
         }
         require(isStarted == true, "Pool not started yet");
-        uint256 post20Bal = poolShares / (erc721Ids.length + erc721Balance);
-        uint256 erc20Out = erc20Balance - post20Bal;
-        erc20Balance -= erc20Out;
-
-        erc20Token.transfer(msg.sender, erc20Out);
+        erc721Balance += erc721Ids.length;
+        erc20Token.transfer(msg.sender, erc20Balance);
+        erc20Balance = poolShares / (erc721Balance);
 
         for (uint256 i = 0; i < erc721Ids.length; i++) {
             erc721Array.push(erc721Ids[i]);
@@ -150,7 +155,7 @@ contract ERC721LP {
         }
     }
 
-    function swapin20(uint256 tokenCount) public {
+    function swapIn20(uint256 tokenCount) public {
         require(isStarted == true, "Pool not started yet");
         require(
             erc20Token.balanceOf(msg.sender) >= tokenCount,
@@ -163,6 +168,9 @@ contract ERC721LP {
         uint256 post721Bal = poolShares / (tokenCount + erc20Balance);
         uint256 erc721Out = erc721Balance - post721Bal;
         erc721Balance -= erc721Out;
+
+        erc20Token.transferFrom(msg.sender, address(this), tokenCount);
+        erc20Balance += tokenCount;
 
         for (uint256 i = 0; i < erc721Out; i++) {
             uint256 tokenId = erc721Array[erc721Array.length - 1];

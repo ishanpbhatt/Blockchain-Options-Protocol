@@ -4,8 +4,8 @@ pragma solidity ^0.8.10;
 
 import "/Users/ishan/.brownie/packages/OpenZeppelin/openzeppelin-contracts@4.4.1/contracts/token/ERC721/ERC721.sol";
 import "/Users/ishan/.brownie/packages/OpenZeppelin/openzeppelin-contracts@4.4.1/contracts/token/ERC20/ERC20.sol";
-import "/Users/ishan/Desktop/personal_projects/vega_protocol/contracts/RightToExecute.sol";
-import "/Users/ishan/Desktop/personal_projects/vega_protocol/contracts/RightToWrite.sol";
+import "./RightToExecute.sol";
+import "./RightToWrite.sol";
 
 contract CallOptionCenter is IERC721Receiver {
     uint256 expirationDate;

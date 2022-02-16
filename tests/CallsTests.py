@@ -1,4 +1,3 @@
-from secrets import token_bytes
 from brownie import *
 import time
 
@@ -37,6 +36,7 @@ def main():
     stable_token_post_mint = stable_asset.balanceOf.call(
         accounts[0], {"from": accounts[0]})
 
+    # Try to liquidate assets from a live unexecuted option
     try:
         rtw_contract.approve.transact(
             calls_center.address, token_id, {"from": accounts[0]})
@@ -57,6 +57,7 @@ def main():
     stable_token_post_execute = stable_asset.balanceOf.call(
         accounts[0], {"from": accounts[0]})
 
+    # Try to execute the option contract twice
     try:
         stable_asset.approve.transact(
             calls_center.address, 10**10, {"from": accounts[0]})
@@ -75,6 +76,7 @@ def main():
     stable_token_post_liquid = stable_asset.balanceOf.call(
         accounts[0], {"from": accounts[0]})
 
+    # Try to withdraw money more than once from the smart contract
     try:
         rtw_contract.approve.transact(
             calls_center.address, token_id, {"from": accounts[0]})
@@ -95,4 +97,4 @@ def main():
     print("\nBalances of account[0] after contracts were executed (RTW):")
     print(var_token_post_liquid)
     print(stable_token_post_liquid)
-    time.sleep(1)
+    time.sleep(1)  # Throws a weird exit error if I don't do this
