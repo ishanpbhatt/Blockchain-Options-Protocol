@@ -151,6 +151,8 @@ contract ERC721LP {
 
         erc721Balance += erc721Ids.length;
 
+        poolShares = erc20Balance * erc721Balance;
+
         for (uint256 i = 0; i < erc721Ids.length; i++) {
             erc721Array.push(erc721Ids[i]);
             erc721Token.transferFrom(msg.sender, address(this), erc721Ids[i]);
@@ -168,11 +170,13 @@ contract ERC721LP {
             "Not enough balance"
         );
         uint256 post721Bal = poolShares / (tokenCount + erc20Balance);
-        uint256 erc721Out = erc721Balance - post721Bal;
+        uint256 erc721Out = (erc721Balance - post721Bal);
         erc721Balance -= erc721Out;
 
         erc20Token.transferFrom(msg.sender, address(this), tokenCount);
         erc20Balance += tokenCount;
+
+        poolShares = erc20Balance * erc721Balance;
 
         for (uint256 i = 0; i < erc721Out; i++) {
             uint256 tokenId = erc721Array[erc721Array.length - 1];
