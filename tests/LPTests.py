@@ -71,7 +71,7 @@ var_asset.approve(liq_pool.address, 10**10, {'from': accounts[1]})
 liq_pool.swapIn20.transact(100, {'from': accounts[1]})
 
 # Ensure Pool Balances are updated
-assert (1100, 45) == liq_pool.getTotalBalances.call(
+assert (1100, 46) == liq_pool.getTotalBalances.call(
 ), "Pool Balances not updated correctly"
 assert (1100) == var_asset.balanceOf(
     liq_pool.address), "Incorrect var asset balance"
@@ -86,7 +86,7 @@ var_asset.approve(liq_pool.address, 10**10, {'from': accounts[2]})
 liq_pool.swapIn20.transact(200, {'from': accounts[2]})
 
 # Ensure Pool Balances are updated
-assert (1300, 38) == liq_pool.getTotalBalances.call(
+assert (1300, 39) == liq_pool.getTotalBalances.call(
 ), "Pool Balances updated incorrectly"
 
 # Ensure User Balances are updated
@@ -101,11 +101,11 @@ rte_contract.approve.transact(liq_pool.address, 61, {'from': accounts[3]})
 liq_pool.swapIn721.transact([61], {'from': accounts[3]})
 
 # Ensure Pool Balances are updated
-assert (1266, 39) == liq_pool.getTotalBalances.call()
+assert (1268, 40) == liq_pool.getTotalBalances.call()
 assert rte_contract.ownerOf(61) == liq_pool.address
 
 # Ensure User balances are updated
-assert 9934 == var_asset.balanceOf(accounts[3], {'from': accounts[3]})
+assert 9932 == var_asset.balanceOf(accounts[3], {'from': accounts[3]})
 
 # Swap In Larger amount of ERC-721
 for i in range(62, 70):
@@ -113,11 +113,11 @@ for i in range(62, 70):
 liq_pool.swapIn721.transact([i for i in range(62, 70)], {'from': accounts[3]})
 
 # Ensure Pool Balances are updated
-assert (1050, 47) == liq_pool.getTotalBalances.call()
+assert (1057, 48) == liq_pool.getTotalBalances.call()
 assert rte_contract.ownerOf(65) == liq_pool.address
 
 # Ensure User balances are updated
-assert 10150 == var_asset.balanceOf(accounts[3], {'from': accounts[3]})
+assert 10143 == var_asset.balanceOf(accounts[3], {'from': accounts[3]})
 
 """
 Add Liquidity
@@ -127,10 +127,9 @@ for i in range(51, 55):
     rte_contract.approve.transact(liq_pool.address, i, {'from': accounts[1]})
 liq_pool.addLiquidity.transact([51, 52, 53, 54], 88, {'from': accounts[1]})
 
-
 assert 352 == liq_pool.getShares.call(accounts[1])
-assert 49702 == liq_pool.getTotalShares.call()
-assert (1138, 51) == liq_pool.getTotalBalances.call()
+assert 51088 == liq_pool.getTotalShares.call()
+assert (1145, 52) == liq_pool.getTotalBalances.call()
 
 # Add again
 for i in range(55, 57):
@@ -138,23 +137,25 @@ for i in range(55, 57):
 liq_pool.addLiquidity.transact([55, 56], 44, {'from': accounts[1]})
 
 assert 440 == liq_pool.getShares.call(accounts[1])
-assert 49790 == liq_pool.getTotalShares.call()
-assert (1182, 53) == liq_pool.getTotalBalances.call()
+assert 51176 == liq_pool.getTotalShares.call()
+assert (1189, 54) == liq_pool.getTotalBalances.call()
 
 """
 Remove Liquidity
 """
 # Remove Full Amount
 liq_pool.removeLiquidity.transact(440, {'from': accounts[1]})
+
 assert 0 == liq_pool.getShares.call(accounts[1])
-assert 49350 == liq_pool.getTotalShares.call()
-assert (1172, 53) == liq_pool.getTotalBalances.call()
+assert 50736 == liq_pool.getTotalShares.call()
+assert (1179, 54) == liq_pool.getTotalBalances.call()
 
 # Remove Partial Amount
 liq_pool.removeLiquidity.transact(20000, {'from': accounts[0]})
+
 assert 30000 == liq_pool.getShares.call(accounts[0])
-assert 29350 == liq_pool.getTotalShares.call()
-assert (698, 32) == liq_pool.getTotalBalances.call()
+assert 30736 == liq_pool.getTotalShares.call()
+assert (715, 33) == liq_pool.getTotalBalances.call()
 
 
 def main():

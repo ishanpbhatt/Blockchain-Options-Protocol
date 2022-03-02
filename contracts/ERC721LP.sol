@@ -144,7 +144,7 @@ contract ERC721LP {
                 "Not approved"
             );
         }
-        uint256 post20Bal = poolShares / (erc721Ids.length + erc721Balance);
+        uint256 post20Bal = poolShares / (erc721Ids.length + erc721Balance) + 1;
         uint256 erc20Out = erc20Balance - post20Bal;
         erc20Balance -= erc20Out;
         erc20Token.transfer(msg.sender, erc20Out);
@@ -169,7 +169,7 @@ contract ERC721LP {
             erc20Token.allowance(msg.sender, address(this)) >= tokenCount,
             "Not enough balance"
         );
-        uint256 post721Bal = poolShares / (tokenCount + erc20Balance);
+        uint256 post721Bal = poolShares / (tokenCount + erc20Balance) + 1;
         uint256 erc721Out = (erc721Balance - post721Bal);
         erc721Balance -= erc721Out;
 
